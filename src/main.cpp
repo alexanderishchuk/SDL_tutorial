@@ -2,18 +2,25 @@
 #include <iostream>
 using namespace std;
 
-int main ()
-{
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+
+// SDL Error Logger
+void logSDLError (ostream &os, const string &msg) {
+    os << msg << " error: " << SDL_GetError() << endl;
+}
+
+int main () {
     // Initializing SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        cout << "SDL_Init Error: " << SDL_GetError() << endl;
+        logSDLError(cout, "SDL_Init");
         return 1;
     }
 
     // Creating window
-    SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
+    SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (win == nullptr) {
-        cout << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
+        logSDLError(cout, "SDL_CreateWindow");
         return 1;
     }
 
@@ -21,14 +28,14 @@ int main ()
     SDL_Renderer *ren = SDL_CreateRenderer(win, -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (ren == nullptr) {
-        cout << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+        logSDLError(cout, "SDL_CreateRenderer");
         return 1;
     }
 
     // Loading image "hello.bmp"
     SDL_Surface *bmp = SDL_LoadBMP("img/hello.bmp");
     if (bmp == nullptr) {
-        cout << "SDL_LoadBMP Error: " << SDL_GetError() << endl;
+        logSDLError(cout, "SDL_LoadBMP");
         return 1;
     }
 
@@ -37,7 +44,7 @@ int main ()
     // Cleaninig memory from needless image.
     SDL_FreeSurface(bmp);
     if (tex == nullptr) {
-        cout << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << endl;
+        logSDLError(cout, "SDL_CreateTextureFromSurface");
         return 1;
     }
 

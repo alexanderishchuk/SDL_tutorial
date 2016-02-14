@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1455462144 source:/home/shur/coding/sdl_tutorial/src/main.cpp
+1455462294 source:/home/shur/coding/sdl_tutorial/src/main.cpp
 	<SDL2/SDL.h>
 	<iostream>
 
