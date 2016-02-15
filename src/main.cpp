@@ -5,10 +5,58 @@ using namespace std;
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+
 // SDL Error Logger
 void logSDLError (ostream &os, const string &msg) {
     os << msg << " error: " << SDL_GetError() << endl;
 }
+
+
+/**
+* Loads a BMP image into a texture on the rendering device
+* @param file The BMP image file to load
+* @param ren The renderer to load the texture onto
+* @return the loaded texture, or nullptr if something went wrong.
+*/
+SDL_Texture* loadTexture (const string &file, SDL_Renderer *ren) {
+    //Initialize to nullptr to avoid dangling pointer issues
+    SDL_Texture *texture = nullptr;
+    //Load the image
+    SDL_Surface *loadedImage = SDL_LoadBMP(file.c_str());
+    //If the loading went ok, convert to texture and return the texture
+    if (loadedImage != nullptr) {
+        texture = SDL_CreateTextureFromSurface(ren, loadedImage);
+        SDL_FreeSurface(loadedImage);
+        //Make sure converting went ok too
+        if (texture == nullptr) {
+            logSDLError(cout, "SDL_CreateTextureFromSurface");
+        }
+    }
+    else {
+        logSDLError(cout, "SDL_LoadBMP");
+    }
+    return texture;
+}
+
+
+/**
+* Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
+* the texture's width and height
+* @param tex The source texture we want to draw
+* @param ren The renderer we want to draw to
+* @param x The x coordinate to draw to
+* @param y The y coordinate to draw to
+*/
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y) {
+    //Setup the destination rectangle to be at the position we want
+    SDL_Rect dst;
+    dst.x = x;
+    dst.y = y;
+    //Query the texture to get its width and height to use
+    SDL_QueryTexture(tex, NULL, NULL, &dst.w, &dst.h);
+    SDL_RenderCopy(ren, tex, NULL, &dst);
+}
+
 
 int main () {
     // Initializing SDL
@@ -33,20 +81,7 @@ int main () {
     }
 
     // Loading image "hello.bmp"
-    SDL_Surface *bmp = SDL_LoadBMP("img/hello.bmp");
-    if (bmp == nullptr) {
-        logSDLError(cout, "SDL_LoadBMP");
-        return 1;
-    }
-
-    // Loading texture to renderer
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
-    // Cleaninig memory from needless image.
-    SDL_FreeSurface(bmp);
-    if (tex == nullptr) {
-        logSDLError(cout, "SDL_CreateTextureFromSurface");
-        return 1;
-    }
+    SDL_Texture *tex = loadTexture("img/hello.bmp", ren);
 
     // Drawing texture
     // Cleaning renderer
