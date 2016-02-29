@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "cleanup.h"
 #include <iostream>
 using namespace std;
 
@@ -78,6 +79,7 @@ int main () {
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (ren == nullptr) {
         logSDLError(cout, "SDL_CreateRenderer");
+
         return 1;
     }
 
@@ -95,10 +97,7 @@ int main () {
     SDL_Delay(2000);
 
     // Cleaning objects
-    SDL_DestroyTexture(tex);
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
-
+    cleanup(tex, ren, win);
     SDL_Quit();
 
     return 0;
