@@ -1,5 +1,0 @@
-# depslib dependency file v1.0
-1455566908 source:/home/shur/coding/sdl_tutorial/src/main.cpp
-	<SDL2/SDL.h>
-	<iostream>
-

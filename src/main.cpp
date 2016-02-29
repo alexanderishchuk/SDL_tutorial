@@ -66,7 +66,8 @@ int main () {
     }
 
     // Creating window
-    SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, SCREEN_WIDTH,
+		SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (win == nullptr) {
         logSDLError(cout, "SDL_CreateWindow");
         return 1;

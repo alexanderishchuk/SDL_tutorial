@@ -1,2 +1,8 @@
 bin/*
 obj/*
+*.geany
+*.cbp
+*.depend
+*.layout
+*.directory
+
