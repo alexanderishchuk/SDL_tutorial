@@ -115,10 +115,11 @@ int main () {
     }
 
     // Loading image "hello.bmp"
-    SDL_Texture *background = loadTexture("img/background.jpg", ren);
-    SDL_Texture *image = loadTexture("img/image.bmp", ren);
+    SDL_Texture *background = loadTexture("img/background.png", ren);
+    SDL_Texture *image = loadTexture("img/image.png", ren);
     if (background == nullptr || image == nullptr) {
         cleanup(background, image, win, ren);
+        IMG_Quit();
         SDL_Quit();
         return 1;
     }
@@ -126,13 +127,25 @@ int main () {
     // Drawing texture
     // Cleaning renderer
     SDL_RenderClear(ren);
+
     // Rendering background
-    int bW, bH;
+/*  int bW, bH;
     SDL_QueryTexture(background, NULL, NULL, &bW, &bH);
     renderTexture(background, ren, 0, 0);
     renderTexture(background, ren, bW, 0);
     renderTexture(background, ren, bW, bH);
-    renderTexture(background, ren, 0, bH);
+    renderTexture(background, ren, 0, bH); */
+    // Determine how many times we'll ned to fill the screen
+    int xTiles = SCREEN_WIDTH / TILE_SIZE;
+    int yTiles = SCREEN_HEIGHT / TILE_SIZE;
+    // Draw tiles by calculating their position
+    for (int i = 0; i < xTiles * yTiles; ++i) {
+        int x = i % xTiles;
+        int y = i / xTiles;
+        renderTexture(background, ren, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE,
+            TILE_SIZE);
+    }
+
     // Rendering foreground image
     int iW, iH;
     SDL_QueryTexture(image, NULL, NULL, &iW, &iH);
@@ -142,10 +155,11 @@ int main () {
     // Show refreshed screen
     SDL_RenderPresent(ren);
 
-    SDL_Delay(2000);
+    SDL_Delay(10000);
 
     // Cleaning objects
     cleanup(background, image, ren, win);
+    IMG_Quit();
     SDL_Quit();
 
     return 0;
