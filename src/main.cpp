@@ -23,30 +23,10 @@ void logSDLError (ostream &os, const string &msg) {
 * @return the loaded texture, or nullptr if something went wrong.
 */
 SDL_Texture* loadTexture (const string &file, SDL_Renderer *ren) {
-/*  OLd code
-    //Initialize to nullptr to avoid dangling pointer issues
-    SDL_Texture *texture = nullptr;
-    //Load the image
-    SDL_Surface *loadedImage = SDL_LoadBMP(file.c_str());
-    //If the loading went ok, convert to texture and return the texture
-    if (loadedImage != nullptr) {
-        texture = SDL_CreateTextureFromSurface(ren, loadedImage);
-        SDL_FreeSurface(loadedImage);
-        //Make sure converting went ok too
-        if (texture == nullptr) {
-            logSDLError(cout, "SDL_CreateTextureFromSurface");
-        }
-    }
-    else {
-        logSDLError(cout, "SDL_LoadBMP");
-    }
-    return texture;
-    */
     SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
     if (texture == nullptr) {
         logSDLError(cout, "IMG_LoadTexture");
     }
-
     return texture;
 }
 
@@ -124,38 +104,52 @@ int main () {
         return 1;
     }
 
-    // Drawing texture
-    // Cleaning renderer
-    SDL_RenderClear(ren);
-
-    // Rendering background
-/*  int bW, bH;
-    SDL_QueryTexture(background, NULL, NULL, &bW, &bH);
-    renderTexture(background, ren, 0, 0);
-    renderTexture(background, ren, bW, 0);
-    renderTexture(background, ren, bW, bH);
-    renderTexture(background, ren, 0, bH); */
-    // Determine how many times we'll ned to fill the screen
-    int xTiles = SCREEN_WIDTH / TILE_SIZE;
-    int yTiles = SCREEN_HEIGHT / TILE_SIZE;
-    // Draw tiles by calculating their position
-    for (int i = 0; i < xTiles * yTiles; ++i) {
-        int x = i % xTiles;
-        int y = i / xTiles;
-        renderTexture(background, ren, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE,
-            TILE_SIZE);
-    }
-
-    // Rendering foreground image
+    SDL_Event e;
+    bool quit = false;
     int iW, iH;
     SDL_QueryTexture(image, NULL, NULL, &iW, &iH);
-    int x = SCREEN_WIDTH / 2 - iW / 2;
-    int y = SCREEN_HEIGHT / 2 - iH / 2;
-    renderTexture(image, ren, x, y);
-    // Show refreshed screen
-    SDL_RenderPresent(ren);
+    int x = 0;
+    int y = 0;
 
-    SDL_Delay(10000);
+    while (!quit) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            }
+            if (e.type == SDL_KEYDOWN) {
+                SDL_KeyboardEvent kEvent = e.key;
+                if (kEvent.keysym.scancode == SDL_SCANCODE_A && x > 0)
+                    x -= 40;
+                if (kEvent.keysym.scancode == SDL_SCANCODE_S && y < SCREEN_HEIGHT - iH )
+                    y += 40;
+                if (kEvent.keysym.scancode == SDL_SCANCODE_D && x < SCREEN_WIDTH - iW)
+                    x += 40;
+                if (kEvent.keysym.scancode == SDL_SCANCODE_W && y > 0)
+                    y -= 40;
+            }
+        }
+        // Drawing texture
+        // Cleaning renderer
+        SDL_RenderClear(ren);
+
+        // Rendering background
+        // Determine how many times we'll ned to fill the screen
+        int xTiles = SCREEN_WIDTH / TILE_SIZE;
+        int yTiles = SCREEN_HEIGHT / TILE_SIZE;
+        // Draw tiles by calculating their position
+        for (int i = 0; i < xTiles * yTiles; ++i) {
+            int x = i % xTiles;
+            int y = i / xTiles;
+            renderTexture(background, ren, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE,
+                TILE_SIZE);
+        }
+
+        // Rendering foreground image
+
+        renderTexture(image, ren, x, y, TILE_SIZE, TILE_SIZE);
+        // Show refreshed screen
+        SDL_RenderPresent(ren);
+    }
 
     // Cleaning objects
     cleanup(background, image, ren, win);
